@@ -108,7 +108,7 @@ export default {
           if (value) {
             // userService.deleteUser(this.form)
             axios
-              .delete(`http://localhost:3000/users/:${this.form.id}`)
+              .delete(`http://localhost:3000/users/` + user._id)
               .then(res => {
                 this.getUsers()
               })
@@ -125,7 +125,7 @@ export default {
     },
     resetModal () {
       this.form = {
-        id: -1,
+        _id: -1,
         name: '',
         gender: null
       }
@@ -136,7 +136,7 @@ export default {
     },
     handleSubmit () {
       if (this.stateName && this.stateGender) {
-        if (this.form.id > 0) {
+        if (this.form._id !== '') {
           axios
             .put('http://localhost:3000/users', this.form)
             .then(res => {
@@ -147,6 +147,7 @@ export default {
             })
           this.getUsers()
         } else {
+          delete this.form._id
           axios
             .post('http://localhost:3000/users', this.form)
             .then(res => {
@@ -164,15 +165,15 @@ export default {
       }
     },
     addUser (user) {
-      user.id = this.lastId++
+      user._id = this.lastId++
       this.userList.push(user)
     },
     updateUser (user) {
-      const index = this.userList.findIndex(item => item.id === user.id)
+      const index = this.userList.findIndex(item => item._id === user._id)
       this.userList.splice(index, 1, user)
     },
     deleteUser (user) {
-      const index = this.userList.findIndex(item => item.id === user.id)
+      const index = this.userList.findIndex(item => item._id === user._id)
       this.userList.splice(index, 1)
     },
     getUsers () {
