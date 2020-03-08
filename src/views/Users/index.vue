@@ -50,6 +50,8 @@
 </template>
 
 <script>
+// import userService from './UserService'
+import axios from 'axios'
 export default {
   data () {
     return {
@@ -69,19 +71,8 @@ export default {
           text: 'ผู้หญิง'
         }
       ],
-      userList: [
-        {
-          id: 1,
-          name: 'dome',
-          gender: 'M'
-        },
-        {
-          id: 2,
-          name: 'phumiphat',
-          gender: 'M'
-        }
-      ],
-      lastId: 3,
+      userList: [],
+
       fields: [
         {
           key: 'id',
@@ -115,7 +106,16 @@ export default {
         })
         .then(value => {
           if (value) {
-            this.deleteUser(user)
+            // userService.deleteUser(this.form)
+            axios
+              .delete(`http://localhost:3000/users/:${this.form.id}`)
+              .then(res => {
+                this.getUsers()
+              })
+              .catch(err => {
+                console.log(err)
+              })
+            this.getUsers()
           }
         })
     },
@@ -137,9 +137,25 @@ export default {
     handleSubmit () {
       if (this.stateName && this.stateGender) {
         if (this.form.id > 0) {
-          this.updateUser(this.form)
+          axios
+            .put('http://localhost:3000/users', this.form)
+            .then(res => {
+              this.getUsers()
+            })
+            .catch(err => {
+              console.log(err)
+            })
+          this.getUsers()
         } else {
-          this.addUser(this.form)
+          axios
+            .post('http://localhost:3000/users', this.form)
+            .then(res => {
+              this.getUsers()
+            })
+            .catch(err => {
+              console.log(err)
+            })
+          this.getUsers()
         }
         // Hide the modal manually
         this.$nextTick(() => {
@@ -158,6 +174,16 @@ export default {
     deleteUser (user) {
       const index = this.userList.findIndex(item => item.id === user.id)
       this.userList.splice(index, 1)
+    },
+    getUsers () {
+      axios
+        .get('http://localhost:3000/users')
+        .then(res => {
+          this.userList = res.data
+        })
+        .catch(err => {
+          console.log(err)
+        })
     }
   },
   computed: {
@@ -190,6 +216,10 @@ export default {
     validFeedbackGender () {
       return this.stateGender === true ? 'สำเร็จ' : ''
     }
+  },
+  mounted () {
+    console.log('VUe component is mounted')
+    this.getUsers()
   }
 }
 </script>
